@@ -5,46 +5,49 @@ import {
   List,
   Button,
   Link,
-} from '@material-ui/core'
-import Layout from '../components/Layout'
-import useStyles from '../utils/styles'
-import NextLink from 'next/link'
-import axios from 'axios'
-import { useContext, useState, useEffect } from 'react'
-import { Store } from '../utils/Store'
-import { useRouter } from 'next/router'
-import Cookies from 'js-cookie'
-import { Controller, useForm } from 'react-hook-form'
-import { useSnackbar } from 'notistack'
-import { getError } from '../utils/error'
+} from '@material-ui/core';
+import Layout from '../components/Layout';
+import useStyles from '../utils/styles';
+import NextLink from 'next/link';
+import axios from 'axios';
+import { useContext, useEffect } from 'react';
+import { Store } from '../utils/Store';
+import { useRouter } from 'next/router';
+import Cookies from 'js-cookie';
+import { Controller, useForm } from 'react-hook-form';
+import { useSnackbar } from 'notistack';
+import { getError } from '../utils/error';
 
 const Login = () => {
   const {
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm()
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
-  const router = useRouter()
-  const { redirect } = router.query
-  const classes = useStyles()
-  const { state, dispatch } = useContext(Store)
-  const { userInfo } = state
+  } = useForm();
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const router = useRouter();
+  const { redirect } = router.query;
+  const classes = useStyles();
+  const { state, dispatch } = useContext(Store);
+  const { userInfo } = state;
   const submitHandler = async ({ email, password }) => {
-    closeSnackbar()
+    closeSnackbar();
     try {
-      const { data } = await axios.post(`/api/users/login`, { email, password })
-      dispatch({ type: 'USER_LOGIN', payload: data })
-      Cookies.set('userInfo', data)
-      router.push(redirect || '/')
+      const { data } = await axios.post(`/api/users/login`, {
+        email,
+        password,
+      });
+      dispatch({ type: 'USER_LOGIN', payload: data });
+      Cookies.set('userInfo', data);
+      router.push(redirect || '/');
     } catch (err) {
-      enqueueSnackbar(getError(err), { variant: 'error' })
+      enqueueSnackbar(getError(err), { variant: 'error' });
     }
-  }
+  };
 
   useEffect(() => {
-    if (userInfo) router.push('/')
-  }, [])
+    if (userInfo) router.push('/');
+  }, []);
 
   return (
     <Layout title="Login">
@@ -117,7 +120,7 @@ const Login = () => {
             </Button>
           </ListItem>
           <ListItem>
-            Don't have an account? &nbsp;
+            Don&apos;t have an account? &nbsp;
             <NextLink href={`/register?redirect=${redirect || '/'}`} passHref>
               <Link>Register</Link>
             </NextLink>
@@ -125,7 +128,7 @@ const Login = () => {
         </List>
       </form>
     </Layout>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

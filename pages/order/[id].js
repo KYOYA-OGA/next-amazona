@@ -66,7 +66,7 @@ const Order = ({ params }) => {
   const router = useRouter();
   const { state } = useContext(Store);
   const { userInfo } = state;
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
@@ -390,5 +390,5 @@ export const getServerSideProps = async ({ params }) => {
   };
 };
 
-//　このページはクライアントサイドレンダリングのみ（サーバーサイドレンダリングをしない）
+// このページはクライアントサイドレンダリングのみ（サーバーサイドレンダリングをしない）
 export default dynamic(() => Promise.resolve(Order), { ssr: false });

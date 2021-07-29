@@ -1,7 +1,7 @@
-import { useContext } from 'react'
-import dynamic from 'next/dynamic'
-import { Store } from '../utils/Store'
-import Layout from '../components/Layout'
+import { useContext } from 'react';
+import dynamic from 'next/dynamic';
+import { Store } from '../utils/Store';
+import Layout from '../components/Layout';
 import {
   Button,
   Card,
@@ -18,40 +18,40 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from '@material-ui/core'
-import NextLink from 'next/link'
-import Image from 'next/image'
-import axios from 'axios'
-import { useRouter } from 'next/router'
+} from '@material-ui/core';
+import NextLink from 'next/link';
+import Image from 'next/image';
+import axios from 'axios';
+import { useRouter } from 'next/router';
 
 const CartScreen = () => {
-  const router = useRouter()
-  const { state, dispatch } = useContext(Store)
+  const router = useRouter();
+  const { state, dispatch } = useContext(Store);
   const {
     cart: { cartItems },
-  } = state
+  } = state;
 
   const updateCartHandler = async (item, quantity) => {
-    const { data } = await axios.get(`/api/products/${item._id}`)
+    const { data } = await axios.get(`/api/products/${item._id}`);
     if (data.countInStock < quantity) {
-      window.alert('Sorry, Product is out of stock')
-      return
+      window.alert('Sorry, Product is out of stock');
+      return;
     }
     dispatch({
       type: 'CART_ADD_ITEM',
       payload: { ...item, quantity },
-    })
-  }
+    });
+  };
   const removeItemHandler = (item) => {
     dispatch({
       type: 'CART_REMOVE_ITEM',
       payload: item,
-    })
-  }
+    });
+  };
 
   const checkoutHandler = () => {
-    router.push('/shipping')
-  }
+    router.push('/shipping');
+  };
   return (
     <Layout title="Shopping cart">
       <Typography component="h1" variant="h1">
@@ -158,8 +158,8 @@ const CartScreen = () => {
         </Grid>
       )}
     </Layout>
-  )
-}
+  );
+};
 
-//　このページはクライアントサイドレンダリングのみ（サーバーサイドレンダリングをしない）
-export default dynamic(() => Promise.resolve(CartScreen), { ssr: false })
+// このページはクライアントサイドレンダリングのみ（サーバーサイドレンダリングをしない）
+export default dynamic(() => Promise.resolve(CartScreen), { ssr: false });

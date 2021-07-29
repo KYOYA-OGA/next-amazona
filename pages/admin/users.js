@@ -87,7 +87,7 @@ const AdminUsers = () => {
 
     try {
       dispatch({ type: 'DELETE_REQUEST' });
-      const { data } = await axios.delete(`/api/admin/users/${userId}`, {
+      await axios.delete(`/api/admin/users/${userId}`, {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
       dispatch({ type: 'DELETE_SUCCESS' });

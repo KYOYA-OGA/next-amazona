@@ -1,4 +1,4 @@
-## React(Next.js) + Material-UI + MongoDB + Cloudinary でつくったショッピングサイト
+## React(Next.js) + Material-UI + MongoDB + Cloudinary でつくるショッピングサイト
 
 ### 技術スタック
 

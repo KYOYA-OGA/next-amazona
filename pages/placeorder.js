@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from 'react'
-import dynamic from 'next/dynamic'
-import { Store } from '../utils/Store'
-import Layout from '../components/Layout'
+import { useContext, useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
+import { Store } from '../utils/Store';
+import Layout from '../components/Layout';
 import {
   Button,
   Card,
@@ -16,45 +16,45 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from '@material-ui/core'
-import NextLink from 'next/link'
-import Image from 'next/image'
-import axios from 'axios'
-import { useRouter } from 'next/router'
-import useStyles from '../utils/styles'
-import CheckoutWizard from '../components/CheckoutWizard'
-import { useSnackbar } from 'notistack'
-import { getError } from '../utils/error'
-import Cookies from 'js-cookie'
+} from '@material-ui/core';
+import NextLink from 'next/link';
+import Image from 'next/image';
+import axios from 'axios';
+import { useRouter } from 'next/router';
+import useStyles from '../utils/styles';
+import CheckoutWizard from '../components/CheckoutWizard';
+import { useSnackbar } from 'notistack';
+import { getError } from '../utils/error';
+import Cookies from 'js-cookie';
 
 const PlaceOrder = () => {
-  const [loading, setLoading] = useState(false)
-  const { closeSnackbar, enqueueSnackbar } = useSnackbar()
-  const classes = useStyles()
-  const router = useRouter()
-  const { state, dispatch } = useContext(Store)
+  const [loading, setLoading] = useState(false);
+  const { closeSnackbar, enqueueSnackbar } = useSnackbar();
+  const classes = useStyles();
+  const router = useRouter();
+  const { state, dispatch } = useContext(Store);
   const {
     userInfo,
     cart: { cartItems, shippingAddress, paymentMethod },
-  } = state
+  } = state;
 
-  const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100 // 123.456 => 123.46
+  const round2 = (num) => Math.round(num * 100 + Number.EPSILON) / 100; // 123.456 => 123.46
   const itemsPrice = round2(
     cartItems.reduce((a, c) => a + c.price * c.quantity, 0)
-  )
-  const shippingPrice = itemsPrice > 200 ? 0 : 15
-  const taxPrice = round2(itemsPrice * 0.15)
-  const totalPrice = round2(itemsPrice + shippingPrice + taxPrice)
+  );
+  const shippingPrice = itemsPrice > 200 ? 0 : 15;
+  const taxPrice = round2(itemsPrice * 0.15);
+  const totalPrice = round2(itemsPrice + shippingPrice + taxPrice);
 
   useEffect(() => {
-    if (!paymentMethod) router.push('/payment')
-    if (cartItems.length === 0) router.push('/cart')
-  }, [])
+    if (!paymentMethod) router.push('/payment');
+    if (cartItems.length === 0) router.push('/cart');
+  }, []);
 
   const placeOrderHandler = async () => {
-    closeSnackbar()
+    closeSnackbar();
     try {
-      setLoading(true)
+      setLoading(true);
       const { data } = await axios.post(
         `/api/orders`,
         {
@@ -69,16 +69,16 @@ const PlaceOrder = () => {
         {
           headers: { authorization: `Bearer ${userInfo.token}` },
         }
-      )
-      console.log(data)
-      dispatch({ type: 'CART_CLEAR' })
-      Cookies.remove('cartItems')
-      setLoading(false)
-      router.push(`/order/${data._id}`)
+      );
+      console.log(data);
+      dispatch({ type: 'CART_CLEAR' });
+      Cookies.remove('cartItems');
+      setLoading(false);
+      router.push(`/order/${data._id}`);
     } catch (err) {
-      enqueueSnackbar(getError(err), { variant: 'error' })
+      enqueueSnackbar(getError(err), { variant: 'error' });
     }
-  }
+  };
 
   return (
     <Layout title="Shopping cart">
@@ -241,8 +241,8 @@ const PlaceOrder = () => {
         </Grid>
       </Grid>
     </Layout>
-  )
-}
+  );
+};
 
-//　このページはクライアントサイドレンダリングのみ（サーバーサイドレンダリングをしない）
-export default dynamic(() => Promise.resolve(PlaceOrder), { ssr: false })
+// このページはクライアントサイドレンダリングのみ（サーバーサイドレンダリングをしない）
+export default dynamic(() => Promise.resolve(PlaceOrder), { ssr: false });

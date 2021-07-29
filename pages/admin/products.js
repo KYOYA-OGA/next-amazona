@@ -114,7 +114,7 @@ const AdminProducts = () => {
 
     try {
       dispatch({ type: 'DELETE_REQUEST' });
-      const { data } = await axios.delete(`/api/admin/products/${productId}`, {
+      await axios.delete(`/api/admin/products/${productId}`, {
         headers: { authorization: `Bearer ${userInfo.token}` },
       });
       dispatch({ type: 'DELETE_SUCCESS' });
