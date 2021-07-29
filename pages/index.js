@@ -17,6 +17,7 @@ import { useContext } from 'react';
 import { Store } from '../utils/Store';
 import axios from 'axios';
 import useStyles from '../utils/styles';
+import { Rating } from '@material-ui/lab';
 
 export default function Home({ products }) {
   const classes = useStyles();
@@ -56,6 +57,7 @@ export default function Home({ products }) {
                     />
                     <CardContent>
                       <Typography>{product.name}</Typography>
+                      <Rating value={product.rating} readOnly></Rating>
                     </CardContent>
                   </CardActionArea>
                 </NextLink>
@@ -63,6 +65,7 @@ export default function Home({ products }) {
                   <Typography>${product.price}</Typography>
                   <Button
                     size="small"
+                    variant="contained"
                     color="primary"
                     onClick={() => addToCartHandler(product)}
                   >
@@ -80,7 +83,7 @@ export default function Home({ products }) {
 
 export const getServerSideProps = async () => {
   await db.connect();
-  const products = await Product.find({}).lean();
+  const products = await Product.find({}, '-reviews').lean();
   await db.disconnect();
 
   return {

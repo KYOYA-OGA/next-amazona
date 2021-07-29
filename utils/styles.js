@@ -50,6 +50,15 @@ const useStyles = makeStyles({
   topImage: {
     maxHeight: 400,
   },
+  reviewForm: {
+    maxWidth: 800,
+    width: '100%',
+  },
+  reviewItem: {
+    marginRight: '1rem',
+    borderRight: '1px solid #808080',
+    paddingRight: '1rem',
+  },
 });
 
 export default useStyles;
