@@ -1,14 +1,20 @@
-import { Grid } from '@material-ui/core'
+/* eslint-disable @next/next/no-img-element */
+import { Grid, Link, Typography } from '@material-ui/core'
+import Carousel from 'react-material-ui-carousel'
+import NextLink from 'next/link'
+import { useRouter } from 'next/router'
+import { useContext } from 'react'
+import axios from 'axios'
+
 import Layout from '../components/Layout'
 import db from '../utils/db'
 import Product from '../models/Product'
-import { useRouter } from 'next/router'
-import { useContext } from 'react'
 import { Store } from '../utils/Store'
-import axios from 'axios'
 import ProductItem from '../components/ProductItem'
+import useStyles from '../utils/styles'
 
-export default function Home({ products }) {
+export default function Home({ topRatedProducts, featuredProducts }) {
+  const classes = useStyles()
   const { state, dispatch } = useContext(Store)
   const router = useRouter()
   const addToCartHandler = async (product) => {
@@ -29,31 +35,52 @@ export default function Home({ products }) {
   }
   return (
     <Layout>
-      <div>
-        <h1>Products</h1>
-        <Grid container spacing={3}>
-          {products.map((product) => (
-            <Grid item md={4} key={product.name}>
-              <ProductItem
-                product={product}
-                addToCartHandler={addToCartHandler}
+      <Carousel className={classes.carousel} animation="slide">
+        {featuredProducts.map((item) => (
+          <NextLink key={item._id} href={`/product/${item.slug}`} passHref>
+            <Link>
+              <img
+                src={item.featuredImage}
+                alt={item.name}
+                className={classes.featuredImage}
               />
-            </Grid>
-          ))}
-        </Grid>
-      </div>
+            </Link>
+          </NextLink>
+        ))}
+      </Carousel>
+      <Typography variant="h2">Popular Products</Typography>
+      <Grid container spacing={3}>
+        {topRatedProducts.map((product) => (
+          <Grid item sm={6} md={4} key={product.name}>
+            <ProductItem
+              product={product}
+              addToCartHandler={addToCartHandler}
+            />
+          </Grid>
+        ))}
+      </Grid>
     </Layout>
   )
 }
 
 export const getServerSideProps = async () => {
   await db.connect()
-  const products = await Product.find({}, '-reviews').lean()
+  const featuredProductsDocs = await Product.find(
+    { isFeatured: true },
+    '-reviews'
+  )
+    .lean()
+    .limit(3)
+  const topRatedProductsDocs = await Product.find({}, '-reviews')
+    .lean()
+    .sort({ rating: -1 })
+    .limit(6)
   await db.disconnect()
 
   return {
     props: {
-      products: products.map(db.convertDocToObj),
+      featuredProducts: featuredProductsDocs.map(db.convertDocToObj),
+      topRatedProducts: topRatedProductsDocs.map(db.convertDocToObj),
     },
   }
 }

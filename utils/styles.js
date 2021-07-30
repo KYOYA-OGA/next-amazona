@@ -29,6 +29,18 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 10,
     marginBottom: 10,
   },
+  carousel: {
+    display: 'none',
+    [theme.breakpoints.up('md')]: {
+      display: 'block',
+      marginTop: 10,
+    },
+  },
+  featuredImage: {
+    height: 300,
+    width: '100%',
+    objectFit: 'cover',
+  },
   form: {
     width: '100%',
     maxWidth: 800,

@@ -1,117 +1,122 @@
 import {
   Button,
   Card,
+  Checkbox,
   CircularProgress,
+  FormControlLabel,
   Grid,
   List,
   ListItem,
   ListItemText,
   TextField,
   Typography,
-} from '@material-ui/core';
-import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
-import React, { useEffect, useContext, useReducer } from 'react';
-import NextLink from 'next/link';
-import axios from 'axios';
-import { Controller, useForm } from 'react-hook-form';
-import { useSnackbar } from 'notistack';
+} from '@material-ui/core'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import React, { useEffect, useContext, useReducer, useState } from 'react'
+import NextLink from 'next/link'
+import axios from 'axios'
+import { Controller, useForm } from 'react-hook-form'
+import { useSnackbar } from 'notistack'
 
-import Layout from '../../../components/Layout';
-import { Store } from '../../../utils/Store';
-import useStyles from '../../../utils/styles';
-import { getError } from '../../../utils/error';
+import Layout from '../../../components/Layout'
+import { Store } from '../../../utils/Store'
+import useStyles from '../../../utils/styles'
+import { getError } from '../../../utils/error'
 
 function reducer(state, action) {
   switch (action.type) {
     case 'FETCH_REQUEST':
-      return { ...state, loading: true, error: '' };
+      return { ...state, loading: true, error: '' }
     case 'FETCH_SUCCESS':
-      return { ...state, loading: false, error: '' };
+      return { ...state, loading: false, error: '' }
     case 'FETCH_FAIL':
-      return { ...state, loading: false, error: action.payload };
+      return { ...state, loading: false, error: action.payload }
     case 'UPDATE_REQUEST':
-      return { ...state, loadingUpdate: true, errorUpdate: '' };
+      return { ...state, loadingUpdate: true, errorUpdate: '' }
     case 'UPDATE_SUCCESS':
-      return { ...state, loadingUpdate: false, errorUpdate: '' };
+      return { ...state, loadingUpdate: false, errorUpdate: '' }
     case 'UPDATE_FAIL':
-      return { ...state, loadingUpdate: false, errorUpdate: action.payload };
+      return { ...state, loadingUpdate: false, errorUpdate: action.payload }
     case 'UPLOAD_REQUEST':
-      return { ...state, loadingUpload: true, errorUpload: '' };
+      return { ...state, loadingUpload: true, errorUpload: '' }
     case 'UPLOAD_SUCCESS':
-      return { ...state, loadingUpload: false, errorUpload: '' };
+      return { ...state, loadingUpload: false, errorUpload: '' }
     case 'UPLOAD_FAIL':
-      return { ...state, loadingUpload: false, errorUpload: action.payload };
+      return { ...state, loadingUpload: false, errorUpload: action.payload }
     default:
-      return state;
+      return state
   }
 }
 
 const ProductEdit = ({ params }) => {
-  const productId = params.id;
+  const productId = params.id
   const [{ loading, error, loadingUpdate, loadingUpload }, dispatch] =
     useReducer(reducer, {
       loading: true,
       error: '',
-    });
+    })
   const {
     handleSubmit,
     control,
     formState: { errors },
     setValue,
-  } = useForm();
-  const classes = useStyles();
-  const { state } = useContext(Store);
-  const { userInfo } = state;
-  const router = useRouter();
-  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  } = useForm()
+  const classes = useStyles()
+  const { state } = useContext(Store)
+  const { userInfo } = state
+  const router = useRouter()
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+  const [isFeatured, setIsFeatured] = useState(false)
 
   useEffect(() => {
-    if (!userInfo) router.push('/login');
+    if (!userInfo) router.push('/login')
 
     const fetchData = async () => {
       try {
-        dispatch({ type: 'FETCH_REQUEST' });
+        dispatch({ type: 'FETCH_REQUEST' })
         const { data } = await axios.get(`/api/admin/products/${productId}`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
-        });
-        dispatch({ type: 'FETCH_SUCCESS' });
-        setValue('name', data.name);
-        setValue('slug', data.slug);
-        setValue('price', data.price);
-        setValue('image', data.image);
-        setValue('category', data.category);
-        setValue('brand', data.brand);
-        setValue('countInStock', data.countInStock);
-        setValue('description', data.description);
+        })
+        dispatch({ type: 'FETCH_SUCCESS' })
+        setValue('name', data.name)
+        setValue('slug', data.slug)
+        setValue('price', data.price)
+        setValue('image', data.image)
+        setValue('featuredImage', data.featuredImage)
+        setIsFeatured(data.isFeatured)
+        setValue('category', data.category)
+        setValue('brand', data.brand)
+        setValue('countInStock', data.countInStock)
+        setValue('description', data.description)
       } catch (err) {
-        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+        dispatch({ type: 'FETCH_FAIL', payload: getError(err) })
       }
-    };
-    fetchData();
-  }, []);
+    }
+    fetchData()
+  }, [])
 
-  const uploadHandler = async (e) => {
-    const file = e.target.files[0];
-    const bodyFormData = new FormData();
-    bodyFormData.append('file', file);
+  const uploadHandler = async (e, imageField = 'image') => {
+    const file = e.target.files[0]
+    const bodyFormData = new FormData()
+    bodyFormData.append('file', file)
     try {
-      dispatch({ type: 'UPLOAD_REQUEST' });
+      dispatch({ type: 'UPLOAD_REQUEST' })
       const { data } = await axios.post(`/api/admin/upload`, bodyFormData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           authorization: `Bearer ${userInfo.token}`,
         },
-      });
+      })
 
-      dispatch({ type: 'UPLOAD_SUCCESS' });
-      setValue('image', data.secure_url);
-      enqueueSnackbar('File uploaded successfully', { variant: 'success' });
+      dispatch({ type: 'UPLOAD_SUCCESS' })
+      setValue(imageField, data.secure_url)
+      enqueueSnackbar('File uploaded successfully', { variant: 'success' })
     } catch (err) {
-      dispatch({ type: 'UPLOAD_FAIL', payload: getError(err) });
-      enqueueSnackbar(getError(err), { variant: 'error' });
+      dispatch({ type: 'UPLOAD_FAIL', payload: getError(err) })
+      enqueueSnackbar(getError(err), { variant: 'error' })
     }
-  };
+  }
 
   const submitHandler = async ({
     name,
@@ -119,14 +124,15 @@ const ProductEdit = ({ params }) => {
     price,
     category,
     image,
+    featuredImage,
     brand,
     countInStock,
     description,
   }) => {
-    closeSnackbar();
+    closeSnackbar()
 
     try {
-      dispatch({ type: 'UPDATE_REQUEST' });
+      dispatch({ type: 'UPDATE_REQUEST' })
       await axios.put(
         `/api/admin/products/${productId}`,
         {
@@ -135,20 +141,22 @@ const ProductEdit = ({ params }) => {
           price,
           category,
           image,
+          isFeatured,
+          featuredImage,
           brand,
           countInStock,
           description,
         },
         { headers: { authorization: `Bearer ${userInfo.token}` } }
-      );
-      dispatch({ type: 'UPDATE_SUCCESS' });
-      enqueueSnackbar('Product updated successfully', { variant: 'success' });
-      router.push('/admin/products');
+      )
+      dispatch({ type: 'UPDATE_SUCCESS' })
+      enqueueSnackbar('Product updated successfully', { variant: 'success' })
+      router.push('/admin/products')
     } catch (err) {
-      dispatch({ type: 'UPDATE_FAIL' });
-      enqueueSnackbar(getError(err), { variant: 'error' });
+      dispatch({ type: 'UPDATE_FAIL' })
+      enqueueSnackbar(getError(err), { variant: 'error' })
     }
-  };
+  }
 
   return (
     <Layout title={`Edit Product ${productId}`}>
@@ -295,6 +303,53 @@ const ProductEdit = ({ params }) => {
                       </Button>
                       {loadingUpload && <CircularProgress />}
                     </ListItem>
+                    <ListItem>
+                      <FormControlLabel
+                        label="Is Featured"
+                        control={
+                          <Checkbox
+                            onClick={(e) => setIsFeatured(e.target.checked)}
+                            checked={isFeatured}
+                            name="isFeatured"
+                          />
+                        }
+                      ></FormControlLabel>
+                    </ListItem>
+
+                    <ListItem>
+                      <Controller
+                        name="featuredImage"
+                        control={control}
+                        defaultValue=""
+                        rules={{
+                          required: true,
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            variant="outlined"
+                            fullWidth
+                            id="featuredImage"
+                            label="FeaturedImage"
+                            error={Boolean(errors.featuredImage)}
+                            helperText={
+                              errors.image && `Featured image is required`
+                            }
+                            {...field}
+                          ></TextField>
+                        )}
+                      ></Controller>
+                    </ListItem>
+                    <ListItem>
+                      <Button variant="contained" component="label">
+                        Upload File
+                        <input
+                          type="file"
+                          onChange={(e) => uploadHandler(e, 'featuredImage')}
+                          hidden
+                        />
+                      </Button>
+                      {loadingUpload && <CircularProgress />}
+                    </ListItem>
 
                     <ListItem>
                       <Controller
@@ -411,15 +466,15 @@ const ProductEdit = ({ params }) => {
         </Grid>
       </Grid>
     </Layout>
-  );
-};
+  )
+}
 
 export const getServerSideProps = async ({ params }) => {
   return {
     props: {
       params,
     },
-  };
-};
+  }
+}
 
-export default dynamic(() => Promise.resolve(ProductEdit), { ssr: false });
+export default dynamic(() => Promise.resolve(ProductEdit), { ssr: false })

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -8,7 +8,7 @@ const reviewSchema = new mongoose.Schema(
     comment: { type: String, required: true },
   },
   { timestamps: true }
-);
+)
 
 const productSchema = new mongoose.Schema(
   {
@@ -57,11 +57,13 @@ const productSchema = new mongoose.Schema(
       required: true,
     },
     reviews: [reviewSchema],
+    featuredImage: { type: String },
+    isFeatured: { type: Boolean, default: false, required: true },
   },
   { timestamps: true }
-);
+)
 
 const Product =
-  mongoose.models.Product || mongoose.model('Product', productSchema);
+  mongoose.models.Product || mongoose.model('Product', productSchema)
 
-export default Product;
+export default Product
