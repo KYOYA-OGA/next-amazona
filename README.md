@@ -21,6 +21,7 @@ https://next-amazona-taupe.vercel.app/
 - Paypal 決済
 - ログイン
 - 注文履歴確認
+- フィルター検索機能
 
 （管理者）
 
